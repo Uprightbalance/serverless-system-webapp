@@ -27,3 +27,8 @@ output "cloudfront_distribution_id" {
   description = "CloudFront distribution ID"
   value       = module.cloudfront.cloudfront_id
 }
+
+output "frontend_url" {
+  description = "Public frontend website URL"
+  value       = "https://${module.cloudfront.cloudfront_domain}"
+}

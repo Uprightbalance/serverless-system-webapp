@@ -37,11 +37,26 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: terraform/environments/dev
 
-      # 🔥 Extract Terraform Outputs
+      # 📋 Show Terraform Outputs
+      - name: Show Terraform Outputs
+        run: terraform output
+        working-directory: terraform/environments/dev
+
+      # 🌐 Show Frontend URL
+      - name: Show Frontend URL
+        run: echo "Frontend URL: $(terraform output -raw frontend_url)"
+        working-directory: terraform/environments/dev
+
+      # 🔗 Show API URL
+      - name: Show API URL
+        run: echo "API URL: $(terraform output -raw api_gateway_url)"
+        working-directory: terraform/environments/dev
+
+      # 🔥 Extract Terraform Outputs for later steps
       - name: Get Terraform Outputs
         run: |
           API_URL=$(terraform output -raw api_gateway_url)
-          S3_BUCKET=$(terraform output -raw s3_bucket_name)
+          S3_BUCKET=$(terraform output -raw frontend_bucket_name)
           DIST_ID=$(terraform output -raw cloudfront_distribution_id)
 
           echo "API_URL=$API_URL" >> $GITHUB_ENV
