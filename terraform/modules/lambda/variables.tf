@@ -1,3 +1,15 @@
-variable "function_name" {}
-variable "role_arn" {}
-variable "table_name" {}
+variable "function_name" {
+  type = string
+}
+
+variable "role_arn" {
+  type = string
+}
+
+variable "table_name" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}

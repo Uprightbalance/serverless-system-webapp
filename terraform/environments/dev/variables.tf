@@ -9,3 +9,7 @@ variable "project_name" {
 variable "environment" {
   default = "dev"
 }
+
+variable "unique_suffix" {
+  default = "3453"
+}
