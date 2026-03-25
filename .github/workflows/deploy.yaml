@@ -46,12 +46,14 @@ jobs:
       # 🌐 Show Frontend URL
       - name: Show Frontend URL
         working-directory: terraform/environments/dev
-        run: echo "Frontend URL: $(terraform output -raw frontend_url)"
+        run: |
+          echo "Frontend URL: $(terraform output -raw frontend_url)"
 
       # 🔗 Show API URL
       - name: Show API URL
         working-directory: terraform/environments/dev
-        run: echo "API URL: $(terraform output -raw api_gateway_url)"
+        run: |
+          echo "API URL: $(terraform output -raw api_gateway_url)"
 
       # 🔥 Extract Terraform Outputs for later steps
       - name: Get Terraform Outputs
@@ -82,7 +84,8 @@ jobs:
 
       # 📤 Upload frontend build to S3
       - name: Upload frontend to S3
-        run: aws s3 sync mrbaffo-frontend/dist s3://$S3_BUCKET --delete
+        run: |
+          aws s3 sync mrbaffo-frontend/dist s3://$S3_BUCKET --delete
 
       # 🚀 Invalidate CloudFront Cache
       - name: Invalidate CloudFront
