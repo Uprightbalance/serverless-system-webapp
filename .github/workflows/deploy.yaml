@@ -2,7 +2,8 @@ name: Full Serverless Deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -29,31 +30,32 @@ jobs:
 
       # 🌍 Terraform Init
       - name: Terraform Init
-        run: terraform init
         working-directory: terraform/environments/dev
+        run: terraform init
 
       # 🚀 Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -auto-approve
         working-directory: terraform/environments/dev
+        run: terraform apply -auto-approve
 
       # 📋 Show Terraform Outputs
       - name: Show Terraform Outputs
-        run: terraform output
         working-directory: terraform/environments/dev
+        run: terraform output
 
       # 🌐 Show Frontend URL
       - name: Show Frontend URL
-        run: echo "Frontend URL: $(terraform output -raw frontend_url)"
         working-directory: terraform/environments/dev
+        run: echo "Frontend URL: $(terraform output -raw frontend_url)"
 
       # 🔗 Show API URL
       - name: Show API URL
-        run: echo "API URL: $(terraform output -raw api_gateway_url)"
         working-directory: terraform/environments/dev
+        run: echo "API URL: $(terraform output -raw api_gateway_url)"
 
       # 🔥 Extract Terraform Outputs for later steps
       - name: Get Terraform Outputs
+        working-directory: terraform/environments/dev
         run: |
           API_URL=$(terraform output -raw api_gateway_url)
           S3_BUCKET=$(terraform output -raw frontend_bucket_name)
@@ -62,7 +64,6 @@ jobs:
           echo "API_URL=$API_URL" >> $GITHUB_ENV
           echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
           echo "DIST_ID=$DIST_ID" >> $GITHUB_ENV
-        working-directory: terraform/environments/dev
 
       # 🧠 Inject frontend environment
       - name: Create frontend .env.production
@@ -71,20 +72,17 @@ jobs:
 
       # 📦 Install frontend dependencies
       - name: Install frontend dependencies
-        run: |
-          cd mrbaffo-frontend
-          npm install
+        working-directory: mrbaffo-frontend
+        run: npm install
 
       # 🏗 Build frontend
       - name: Build frontend
-        run: |
-          cd mrbaffo-frontend
-          npm run build
+        working-directory: mrbaffo-frontend
+        run: npm run build
 
       # 📤 Upload frontend build to S3
       - name: Upload frontend to S3
-        run: |
-          aws s3 sync mrbaffo-frontend/dist s3://$S3_BUCKET --delete
+        run: aws s3 sync mrbaffo-frontend/dist s3://$S3_BUCKET --delete
 
       # 🚀 Invalidate CloudFront Cache
       - name: Invalidate CloudFront
