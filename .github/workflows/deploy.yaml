@@ -1,0 +1,79 @@
+name: Full Serverless Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: us-east-1
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 🔐 Configure AWS Credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ⚙️ Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 🌍 Terraform Init
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform/environments/dev
+
+      # 🚀 Terraform Apply
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: terraform/environments/dev
+
+      # 🔥 Extract Terraform Outputs
+      - name: Get Terraform Outputs
+        run: |
+          API_URL=$(terraform output -raw api_gateway_url)
+          S3_BUCKET=$(terraform output -raw s3_bucket_name)
+          DIST_ID=$(terraform output -raw cloudfront_distribution_id)
+
+          echo "API_URL=$API_URL" >> $GITHUB_ENV
+          echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+          echo "DIST_ID=$DIST_ID" >> $GITHUB_ENV
+        working-directory: terraform/environments/dev
+
+      # 🧠 Inject frontend environment
+      - name: Create frontend .env.production
+        run: |
+          echo "VITE_API_BASE_URL=$API_URL" > mrbaffo-frontend/.env.production
+
+      # 📦 Install frontend dependencies
+      - name: Install frontend dependencies
+        run: |
+          cd mrbaffo-frontend
+          npm install
+
+      # 🏗 Build frontend
+      - name: Build frontend
+        run: |
+          cd mrbaffo-frontend
+          npm run build
+
+      # 📤 Upload frontend build to S3
+      - name: Upload frontend to S3
+        run: |
+          aws s3 sync mrbaffo-frontend/dist s3://$S3_BUCKET --delete
+
+      # 🚀 Invalidate CloudFront cache
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $DIST_ID \
+            --paths "/*"
