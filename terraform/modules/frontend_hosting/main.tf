@@ -12,7 +12,7 @@ resource "aws_s3_bucket_public_access_block" "block" {
 }
 
 resource "aws_cloudfront_origin_access_control" "oac" {
-  name                              = "${var.project_name}-${var.environment}-oac"
+  name                              = "${var.project_name}-${var.environment}-${var.bucket_name}-oac"
   description                       = "CloudFront access to private S3 bucket"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
