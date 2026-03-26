@@ -2,6 +2,10 @@ resource "aws_s3_bucket" "frontend" {
   bucket = var.bucket_name
 }
 
+resource "random_id" "oac_suffix" {
+  byte_length = 2
+}
+
 resource "aws_s3_bucket_public_access_block" "block" {
   bucket = aws_s3_bucket.frontend.id
 
@@ -12,7 +16,7 @@ resource "aws_s3_bucket_public_access_block" "block" {
 }
 
 resource "aws_cloudfront_origin_access_control" "oac" {
-  name                              = "${var.project_name}-${var.environment}-${var.bucket_name}-oac"
+  name                              = "${var.project_name}-${var.environment}-frontend-oac-${random_id.oac_suffix.hex}"
   description                       = "CloudFront access to private S3 bucket"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
