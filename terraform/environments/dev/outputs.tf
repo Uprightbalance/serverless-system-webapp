@@ -5,12 +5,12 @@ output "api_gateway_url" {
 
 output "cloudfront_url" {
   description = "CloudFront distribution domain"
-  value       = module.cloudfront.cloudfront_domain
+  value       = module.frontend_hosting.cloudfront_domain
 }
 
 output "s3_bucket_name" {
   description = "Frontend bucket"
-  value       = module.s3.bucket_name
+  value       = module.frontend_hosting.bucket_name
 }
 
 output "lambda_function_name" {
@@ -25,10 +25,10 @@ output "dynamodb_table_name" {
 
 output "cloudfront_distribution_id" {
   description = "CloudFront distribution ID"
-  value       = module.cloudfront.cloudfront_id
+  value       = module.frontend_hosting.cloudfront_id
 }
 
 output "frontend_url" {
   description = "Public frontend website URL"
-  value       = "https://${module.cloudfront.cloudfront_domain}"
+  value       = "https://${module.frontend_hosting.cloudfront_domain}"
 }

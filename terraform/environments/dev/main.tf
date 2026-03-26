@@ -24,14 +24,9 @@ module "apigateway" {
   lambda_invoke_arn = module.lambda.lambda_invoke_arn
 }
 
-module "s3" {
-  source = "../../modules/s3"
-
-  bucket_name = "${var.project_name}-frontend-${var.environment}-${var.unique_suffix}"
-}
-
-module "cloudfront" {
-  source = "../../modules/cloudfront"
-
-  bucket_domain = module.s3.bucket_domain_name
+module "frontend_hosting" {
+  source       = "../../modules/frontend_hosting"
+  bucket_name  = "${var.project_name}-frontend-${var.environment}-3453"
+  project_name = var.project_name
+  environment  = var.environment
 }
