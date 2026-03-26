@@ -1,4 +1,7 @@
 variable "bucket_name" {
-  description = "Name of the frontend S3 bucket"
-  type        = string
+  type = string
+}
+
+variable "cloudfront_distribution_arn" {
+  type = string
 }
