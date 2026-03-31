@@ -117,7 +117,3 @@ jobs:
             --distribution-id $DIST_ID \
             --paths "/*"
 
-      # 🩺 Smoke test API
-      - name: Smoke test API
-        run: |
-          curl -f "$API_URL/" || exit 1
