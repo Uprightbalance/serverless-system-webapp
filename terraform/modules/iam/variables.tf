@@ -5,3 +5,7 @@ variable "project_name" {
 variable "environment" {
   type = string
 }
+
+variable "unique_suffix" {
+  type = string
+}

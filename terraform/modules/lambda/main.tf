@@ -15,6 +15,8 @@ resource "aws_lambda_function" "app" {
     variables = {
       TABLE_NAME  = var.table_name
       ENVIRONMENT = var.environment
+      APP_NAME    = var.app_name
+      CORS_ORIGINS = var.cors_origins
     }
   }
 }

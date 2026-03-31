@@ -1,13 +1,18 @@
-name: Full Serverless Deploy
+name: Full Serverless Deploy - Staging
 
 on:
   push:
     branches:
       - main
 
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: staging
 
     env:
       AWS_REGION: us-east-1
@@ -28,36 +33,54 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      # 🟩 Setup Node.js (for Vite React frontend)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: mrbaffo-frontend/package-lock.json
+
       # 🌍 Terraform Init
       - name: Terraform Init
-        working-directory: terraform/environments/dev
+        working-directory: terraform/environments/staging
         run: terraform init
+
+      # ✅ Terraform Validate
+      - name: Terraform Validate
+        working-directory: terraform/environments/staging
+        run: terraform validate
+
+      # 📐 Terraform Plan
+      - name: Terraform Plan
+        working-directory: terraform/environments/staging
+        run: terraform plan -out=tfplan
 
       # 🚀 Terraform Apply
       - name: Terraform Apply
-        working-directory: terraform/environments/dev
-        run: terraform apply -auto-approve
+        working-directory: terraform/environments/staging
+        run: terraform apply -auto-approve tfplan
 
       # 📋 Show Terraform Outputs
       - name: Show Terraform Outputs
-        working-directory: terraform/environments/dev
+        working-directory: terraform/environments/staging
         run: terraform output
 
       # 🌐 Show Frontend URL
       - name: Show Frontend URL
-        working-directory: terraform/environments/dev
+        working-directory: terraform/environments/staging
         run: |
           echo "Frontend URL: $(terraform output -raw frontend_url)"
 
       # 🔗 Show API URL
       - name: Show API URL
-        working-directory: terraform/environments/dev
+        working-directory: terraform/environments/staging
         run: |
           echo "API URL: $(terraform output -raw api_gateway_url)"
 
       # 🔥 Extract Terraform Outputs for later steps
       - name: Get Terraform Outputs
-        working-directory: terraform/environments/dev
+        working-directory: terraform/environments/staging
         run: |
           API_URL=$(terraform output -raw api_gateway_url)
           S3_BUCKET=$(terraform output -raw s3_bucket_name)
@@ -75,7 +98,7 @@ jobs:
       # 📦 Install frontend dependencies
       - name: Install frontend dependencies
         working-directory: mrbaffo-frontend
-        run: npm install
+        run: npm ci
 
       # 🏗 Build frontend
       - name: Build frontend
@@ -93,3 +116,8 @@ jobs:
           aws cloudfront create-invalidation \
             --distribution-id $DIST_ID \
             --paths "/*"
+
+      # 🩺 Smoke test API
+      - name: Smoke test API
+        run: |
+          curl -f "$API_URL/" || exit 1
