@@ -6,13 +6,13 @@ on:
       - main
 
 concurrency:
-  group: staging-deploy
+  group: prod-deploy
   cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: prod
 
     env:
       AWS_REGION: us-east-1
@@ -43,44 +43,44 @@ jobs:
 
       # 🌍 Terraform Init
       - name: Terraform Init
-        working-directory: terraform/environments/staging
+        working-directory: terraform/environments/prod
         run: terraform init
 
       # ✅ Terraform Validate
       - name: Terraform Validate
-        working-directory: terraform/environments/staging
+        working-directory: terraform/environments/prod
         run: terraform validate
 
       # 📐 Terraform Plan
       - name: Terraform Plan
-        working-directory: terraform/environments/staging
+        working-directory: terraform/environments/prod
         run: terraform plan -out=tfplan
 
       # 🚀 Terraform Apply
       - name: Terraform Apply
-        working-directory: terraform/environments/staging
+        working-directory: terraform/environments/prod
         run: terraform apply -auto-approve tfplan
 
       # 📋 Show Terraform Outputs
       - name: Show Terraform Outputs
-        working-directory: terraform/environments/staging
+        working-directory: terraform/environments/prod
         run: terraform output
 
       # 🌐 Show Frontend URL
       - name: Show Frontend URL
-        working-directory: terraform/environments/staging
+        working-directory: terraform/environments/prod
         run: |
           echo "Frontend URL: $(terraform output -raw frontend_url)"
 
       # 🔗 Show API URL
       - name: Show API URL
-        working-directory: terraform/environments/staging
+        working-directory: terraform/environments/prod
         run: |
           echo "API URL: $(terraform output -raw api_gateway_url)"
 
       # 🔥 Extract Terraform Outputs for later steps
       - name: Get Terraform Outputs
-        working-directory: terraform/environments/staging
+        working-directory: terraform/environments/prod
         run: |
           API_URL=$(terraform output -raw api_gateway_url)
           S3_BUCKET=$(terraform output -raw s3_bucket_name)
