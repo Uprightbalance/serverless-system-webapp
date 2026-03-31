@@ -11,7 +11,8 @@ terraform {
 module "iam" {
   source       = "../../modules/iam"
   project_name = var.project_name
-  environment  = var.environment 
+  environment  = var.environment
+  unique_suffix = var.unique_suffix
 }
 
 module "dynamodb" {
