@@ -1,2 +1,2 @@
 app_name      = "MR BAFFO API"
-cors_origins  = "http://localhost:5173"
+cors_origins  = "https://dcbdcoc5wr22d.cloudfront.net"
