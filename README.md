@@ -196,7 +196,6 @@ The backend is API-driven and request-based, making Lambda a strong fit.
 
 * cold starts
 * runtime packaging considerations
-* stateless execution model
 * not ideal for long-running or connection-heavy workloads
 
 ## Why it was acceptable
