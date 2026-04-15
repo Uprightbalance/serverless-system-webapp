@@ -1,11 +1,14 @@
+# 🌍 Frontend bucket
 resource "aws_s3_bucket" "frontend" {
   bucket = var.bucket_name
 }
 
+# 📦 CloudFront Logs Bucket
 resource "aws_s3_bucket" "cloudfront_logs" {
   bucket = "${var.project_name}-${var.environment}-${var.unique_suffix}-cf-logs"
 }
 
+# ✅ Enable ACL support (CRITICAL)
 resource "aws_s3_bucket_ownership_controls" "logs" {
   bucket = aws_s3_bucket.cloudfront_logs.id
 
@@ -14,6 +17,7 @@ resource "aws_s3_bucket_ownership_controls" "logs" {
   }
 }
 
+# ✅ Apply ACL for CloudFront logging
 resource "aws_s3_bucket_acl" "logs_acl" {
   depends_on = [aws_s3_bucket_ownership_controls.logs]
 
@@ -21,10 +25,7 @@ resource "aws_s3_bucket_acl" "logs_acl" {
   acl    = "log-delivery-write"
 }
 
-resource "random_id" "oac_suffix" {
-  byte_length = 2
-}
-
+# 🔐 Block public access to frontend bucket
 resource "aws_s3_bucket_public_access_block" "block" {
   bucket = aws_s3_bucket.frontend.id
 
@@ -34,6 +35,12 @@ resource "aws_s3_bucket_public_access_block" "block" {
   restrict_public_buckets = true
 }
 
+# 🎲 Unique OAC suffix
+resource "random_id" "oac_suffix" {
+  byte_length = 2
+}
+
+# 🔐 CloudFront Origin Access Control
 resource "aws_cloudfront_origin_access_control" "oac" {
   name                              = "${var.project_name}-${var.environment}-frontend-oac-${random_id.oac_suffix.hex}"
   description                       = "CloudFront access to private S3 bucket"
@@ -42,7 +49,10 @@ resource "aws_cloudfront_origin_access_control" "oac" {
   signing_protocol                  = "sigv4"
 }
 
+# 🚀 CloudFront Distribution
 resource "aws_cloudfront_distribution" "cdn" {
+  depends_on = [aws_s3_bucket_acl.logs_acl]  # 🔥 CRITICAL FIX
+
   enabled             = true
   default_root_object = "index.html"
 
@@ -78,7 +88,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     cloudfront_default_certificate = true
   }
 
-  # React/Vite SPA support
+  # SPA routing (Vite/React)
   custom_error_response {
     error_code            = 403
     response_code         = 200
@@ -92,14 +102,16 @@ resource "aws_cloudfront_distribution" "cdn" {
     response_page_path    = "/index.html"
     error_caching_min_ttl = 0
   }
-  
+
+  # 📊 Logging (FIXED)
   logging_config {
-    bucket = aws_s3_bucket.cloudfront_logs.bucket_domain_name
-    prefix = "cloudfront/"
+    bucket          = "${aws_s3_bucket.cloudfront_logs.bucket}.s3.amazonaws.com"
     include_cookies = false
+    prefix          = "cloudfront/"
   }
 }
 
+# 🔐 Allow CloudFront to access frontend bucket
 resource "aws_s3_bucket_policy" "allow_cloudfront" {
   bucket = aws_s3_bucket.frontend.id
 
