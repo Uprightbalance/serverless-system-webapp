@@ -1,4 +1,4 @@
-name: Full Serverless Deploy - Prod
+name: Full Serverless Deploy - prod
 
 on:
   push:
