@@ -21,3 +21,14 @@ variable "app_name" {
 variable "cors_origins" {
   type = string
 }
+
+
+variable "log_retention_days" {
+  type    = number
+  default = 14
+}
+
+variable "lambda_insights_layer_arn" {
+  type    = string
+  default = ""
+}

@@ -2,6 +2,10 @@ resource "aws_s3_bucket" "frontend" {
   bucket = var.bucket_name
 }
 
+resource "aws_s3_bucket" "cloudfront_logs" {
+  bucket = "${var.project_name}-${var.environment}-${var.unique_suffix}-cf-logs"
+}
+
 resource "random_id" "oac_suffix" {
   byte_length = 2
 }
@@ -72,6 +76,12 @@ resource "aws_cloudfront_distribution" "cdn" {
     response_code         = 200
     response_page_path    = "/index.html"
     error_caching_min_ttl = 0
+  }
+  
+  logging_config {
+    bucket = aws_s3_bucket.cloudfront_logs.bucket_domain_name
+    prefix = "cloudfront/"
+    include_cookies = false
   }
 }
 

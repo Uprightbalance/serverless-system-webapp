@@ -22,3 +22,13 @@ variable "cors_origins" {
   type = string
 }
 
+
+variable "enable_lambda_insights" {
+  type    = bool
+  default = true
+}
+
+variable "alarm_email" {
+  description = "Email for CloudWatch alerts"
+  type        = string
+}

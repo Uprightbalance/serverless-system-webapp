@@ -13,3 +13,13 @@ variable "environment" {
 variable "unique_suffix" {
   default = "3453"
 }
+
+variable "enable_lambda_insights" {
+  type    = bool
+  default = false
+}
+
+variable "alarm_email" {
+  description = "Email for CloudWatch alerts"
+  type        = string
+}

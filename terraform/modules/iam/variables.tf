@@ -9,3 +9,8 @@ variable "environment" {
 variable "unique_suffix" {
   type = string
 }
+
+variable "lambda_insights_layer_arn" {
+  type    = string
+  default = ""
+}
