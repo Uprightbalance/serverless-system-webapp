@@ -1,4 +1,4 @@
-name: Full Serverless Deploy - Staging
+name: Full Serverless Deploy - Prod
 
 on:
   push:

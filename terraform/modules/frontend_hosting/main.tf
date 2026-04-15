@@ -6,6 +6,21 @@ resource "aws_s3_bucket" "cloudfront_logs" {
   bucket = "${var.project_name}-${var.environment}-${var.unique_suffix}-cf-logs"
 }
 
+resource "aws_s3_bucket_ownership_controls" "logs" {
+  bucket = aws_s3_bucket.cloudfront_logs.id
+
+  rule {
+    object_ownership = "ObjectWriter"
+  }
+}
+
+resource "aws_s3_bucket_acl" "logs_acl" {
+  depends_on = [aws_s3_bucket_ownership_controls.logs]
+
+  bucket = aws_s3_bucket.cloudfront_logs.id
+  acl    = "log-delivery-write"
+}
+
 resource "random_id" "oac_suffix" {
   byte_length = 2
 }
