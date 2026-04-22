@@ -20,14 +20,35 @@ It was designed to achieve the following goals:
 - **Hands-off frontend deployment**
 - **Backend API hosting without managing servers**
 
-The application is composed of:
+## Component Breakdown
 
-- a **Vite React frontend**
-- **Amazon DynamoDB** provisioned as the target persistence layer for the serverless architecture
-- **Amazon API Gateway** as the HTTP entry point
-- **Amazon DynamoDB** as the persistence layer
-- **Terraform** for infrastructure provisioning
-- **GitHub Actions** for CI/CD automation
+### Frontend
+- Vite React
+- Static assets hosted in Amazon S3
+- Globally distributed via Amazon CloudFront
+
+### Backend
+- Python API
+- Packaged and deployed to AWS Lambda
+- Invoked via Amazon API Gateway (HTTP API)
+
+### Database
+- Amazon DynamoDB (PAY_PER_REQUEST)
+
+### Infrastructure as Code
+- Terraform (modular design)
+- Modularized by responsibility and environment
+
+### CI/CD
+- GitHub Actions
+- Automates infrastructure deployment and frontend publishing
+
+### Observability & Cost
+- CloudWatch Logs + Metrics + Dashboard
+- SNS Alerts
+- AWS Budgets
+- Cost Anomaly Detection
+- CloudFront access logs (S3)
 
 ---
 
@@ -81,32 +102,6 @@ DynamoDB
 
 ---
 
-## Component Breakdown
-
-### Frontend
-* Vite React
-* Static assets hosted in Amazon S3
-* Globally distributed via Amazon CloudFront
-
-### Backend
-* Python API
-* Packaged and deployed to AWS Lambda
-* Invoked through Amazon API Gateway (HTTP API)
-
-### Database
-* Amazon DynamoDB
-* Configured with PAY_PER_REQUEST billing
-
-### Infrastructure as Code
-* Terraform
-* Modularized by responsibility and environment
-
-### CI/CD
-* GitHub Actions
-* Automates infrastructure deployment and frontend publishing
-
----
-
 # Repository Structure
 
 ```text
@@ -114,19 +109,57 @@ serverless-project/
 ├── mrbaffo-backend/                  # Python backend source code
 ├── mrbaffo-frontend/                 # Vite React frontend source code
 ├── terraform/
-│   ├── environments/
-│   │   ├── dev/
-│   │   ├── staging/
-│   │   └── prod/
-│   ├── modules/
-│   │   ├── apigateway/
-│   │   ├── dynamodb/
-│   │   ├── frontend_hosting/
-│   │   ├── iam/
-│   │   └── lambda/
-│   ├── main.tf
-│   ├── providers.tf
-│   └── variables.tf
+│  ├── environments
+│   ├── dev
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   ├── terraform.tfvars
+│   │   └── variables.tf
+│   ├── prod
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   ├── terraform.tfvars
+│   │   └── variables.tf
+│   └── staging
+│       ├── main.tf
+│       ├── outputs.tf
+│       ├── terraform.tfvars
+│       └── variables.tf
+├── main.tf
+├── modules
+│   ├── apigateway
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── cost
+│   │   ├── main.tf
+│   │   └── variables.tf
+│   ├── dashboard
+│   │   ├── main.tf
+│   │   └── variables.tf
+│   ├── dynamodb
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── frontend_hosting
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── iam
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── lambda
+│   │   ├── function.zip
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   └── monitoring
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+├── providers.tf
+└── variables.tf
 └── .github/workflows/
 ```
 
@@ -134,13 +167,16 @@ serverless-project/
 
 * Fully serverless AWS architecture
 * Modular Terraform infrastructure
-* Multi-environment deployment model
-* Automated frontend build and publishing
+* Multi-environment deployment model (dev / staging / prod)
+* Automated frontend build and publishing 
 * CloudFront-backed secure static hosting
-* API Gateway to Lambda integration
+* API Gateway to Lambda backend integration
 * DynamoDB persistence layer
-* CI/CD deployment through GitHub Actions
-* Dynamic environment variable injection
+* Built-in monitoring and alerting
+* CloudWatch dashboards
+* Cost visibility and anomaly detection
+* CI/CD automation with GitHub Actions
+* Resource tagging strategy
 * Pay-per-use infrastructure design
 
 # AWS Services Used
@@ -152,6 +188,9 @@ serverless-project/
 * Amazon DynamoDB
 * AWS IAM
 * Amazon CloudWatch Logs
+* AWS SNS
+* AWS Budgets
+* AWS Cost Anomaly Detection 
 
 # Design Decisions and Rationale
 
@@ -171,7 +210,6 @@ The frontend is a static Vite React build, which makes S3 + CloudFront a natural
 
 ### Tradeoff
 
-* frontend is static only
 * no server-side rendering
 * cache invalidation must be handled after deployment
 
@@ -402,6 +440,79 @@ Responsible for:
 * S3 bucket creation
 * CloudFront distribution
 * secure frontend delivery
+
+#### monitoring 
+
+* CloudWatch alarms
+* SNS alerting
+
+#### Cost
+
+* AWS Budgets
+* Cost alerts
+* Cost anomaly detection
+
+## Observability & Monitoring
+
+#### Logging 
+* Lambda → CloudWatch Logs
+* API Gateway → CloudWatch Logs
+* CloudFront → S3 logs
+
+## Metrics & Alerts
+
+#### Lambda
+* Errors
+* Duration
+* Throttles
+
+#### API Gateway
+* 5xx errors
+
+#### DynamoDB
+* Throttled requests
+
+#### Alerting
+* SNS topic configured
+* Email notifications
+* Triggered on threshold breaches
+
+#### CloudWatch Dashboard
+
+Provides visibility into:
+* Lambda performance
+* API errors
+* DynamoDB usage
+* System health
+
+### Cost Management
+
+#### AWS Budgets
+
+* Monthly spend tracking
+* Alert thresholds
+
+#### Cost Anomaly Detection 
+
+* Detects unusual spikes
+* Sends alerts automatically
+
+#### Tagging Strategy 
+
+All resources include:
+
+```bash
+tags = {
+  Project     = var.project_name
+  Environment = var.environment
+}
+```
+
+#### Why 
+
+* Enables cost tracking
+* Improves organization
+* Supports budget filtering
 
 ### Why modular Terraform was used
 
@@ -638,11 +749,13 @@ CORS_ORIGINS=https://your-cloudfront-domain
 
 This project involved troubleshooting and resolving issues that commonly appear in real infrastructure work, including:
 
-* Terraform module input mismatches
-* Lambda packaging/runtime issues
-* API Gateway invoke permission problems
-* CloudFront / S3 access denied issues
-* missing Terraform outputs
+* Terraform state management
+* IAM permission issues
+* CloudFront + S3 restrictions
+* Lambda packaging/debugging
+* API Gateway integration issues
+* Monitoring and alert setup
+* Cost visibility implementation
 
 > These were real issues — with patience and rollback on my part i was able to resolve all in good time.
 
@@ -659,7 +772,8 @@ This project demonstrates hands-on ability in:
 - environment-aware infrastructure design
 - frontend/backend deployment integration
 - operational troubleshooting and debugging
-- cost-conscious architecture decisions
+- Monitoring & observability
+- Cost optimization
 - technical tradeoff evaluation
 
 ---
@@ -671,9 +785,11 @@ This project was designed not just to “deploy an app,” but to demonstrate ho
 * infrastructure design
 * security
 * automation
-* cost
+* cost optimization
 * environment separation
+* monitoring and alerting
 * backend tradeoffs
 * operational simplicity
+* real-world troubleshooting
 
-> It reflects a practical production-style serverless deployment workflow using AWS, Terraform, and GitHub Actions.
+> A complete, production-style serverless system built with AWS, Terraform, and GitHub Actions.
