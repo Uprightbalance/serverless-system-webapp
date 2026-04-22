@@ -102,6 +102,7 @@ module "dashboard" {
   lambda_function_name = module.lambda.function_name
   api_id               = module.apigateway.api_id
   dynamodb_table_name  = module.dynamodb.table_name
+  aws_region           = data.aws_region.current.id
 
   tags = local.common_tags
 }

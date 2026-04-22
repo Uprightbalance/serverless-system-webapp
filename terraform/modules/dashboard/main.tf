@@ -4,93 +4,113 @@ resource "aws_cloudwatch_dashboard" "main" {
   dashboard_body = jsonencode({
     widgets = [
 
-      # 🔹 Lambda Invocations
       {
         type = "metric"
-        x    = 0
-        y    = 0
-        width  = 12
+        x = 0
+        y = 0
+        width = 12
         height = 6
 
         properties = {
-          title = "Lambda Invocations"
+          title  = "Lambda Invocations"
+          region = var.aws_region
+
           metrics = [
             ["AWS/Lambda", "Invocations", "FunctionName", var.lambda_function_name]
           ]
+
           stat   = "Sum"
           period = 300
+
+          annotations = {}
         }
       },
 
-      # 🔹 Lambda Errors
       {
         type = "metric"
-        x    = 12
-        y    = 0
-        width  = 12
+        x = 12
+        y = 0
+        width = 12
         height = 6
 
         properties = {
-          title = "Lambda Errors"
+          title  = "Lambda Errors"
+          region = var.aws_region
+
           metrics = [
             ["AWS/Lambda", "Errors", "FunctionName", var.lambda_function_name]
           ]
+
           stat   = "Sum"
           period = 300
+
+          annotations = {}
         }
       },
 
-      # 🔹 Lambda Duration
       {
         type = "metric"
-        x    = 0
-        y    = 6
-        width  = 12
+        x = 0
+        y = 6
+        width = 12
         height = 6
 
         properties = {
-          title = "Lambda Duration"
+          title  = "Lambda Duration"
+          region = var.aws_region
+
           metrics = [
             ["AWS/Lambda", "Duration", "FunctionName", var.lambda_function_name]
           ]
+
           stat   = "Average"
           period = 300
+
+          annotations = {}
         }
       },
 
-      # 🔹 API Gateway Requests
       {
         type = "metric"
-        x    = 12
-        y    = 6
-        width  = 12
+        x = 12
+        y = 6
+        width = 12
         height = 6
 
         properties = {
-          title = "API Gateway Requests"
+          title  = "API Gateway Requests"
+          region = var.aws_region
+
           metrics = [
             ["AWS/ApiGateway", "Count", "ApiId", var.api_id]
           ]
+
           stat   = "Sum"
           period = 300
+
+          annotations = {}
         }
       },
 
-      # 🔹 DynamoDB Consumed Read Capacity
       {
         type = "metric"
-        x    = 0
-        y    = 12
-        width  = 12
+        x = 0
+        y = 12
+        width = 12
         height = 6
 
         properties = {
-          title = "DynamoDB Read Usage"
+          title  = "DynamoDB Read Usage"
+          region = var.aws_region
+
           metrics = [
             ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", var.dynamodb_table_name]
           ]
+
           stat   = "Sum"
           period = 300
+
+          annotations = {}
         }
       }
     ]
