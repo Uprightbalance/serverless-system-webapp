@@ -1,6 +1,8 @@
 resource "aws_apigatewayv2_api" "api" {
   name          = var.api_name
   protocol_type = "HTTP"
+
+  tags = var.tags
 }
 
 resource "aws_apigatewayv2_integration" "lambda" {
@@ -19,6 +21,8 @@ resource "aws_apigatewayv2_route" "route" {
 resource "aws_cloudwatch_log_group" "api_logs" {
   name              = "/aws/apigateway/${var.api_name}"
   retention_in_days = var.log_retention_days
+
+  tags = var.tags
 }
 
 resource "aws_apigatewayv2_stage" "stage" {
@@ -29,14 +33,14 @@ resource "aws_apigatewayv2_stage" "stage" {
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_logs.arn
     format = jsonencode({
-      requestId      = "$context.requestId"
-      sourceIp       = "$context.identity.sourceIp"
-      requestTime    = "$context.requestTime"
-      httpMethod     = "$context.httpMethod"
-      routeKey       = "$context.routeKey"
-      status         = "$context.status"
-      protocol       = "$context.protocol"
-      responseLength = "$context.responseLength"
+      requestId        = "$context.requestId"
+      sourceIp         = "$context.identity.sourceIp"
+      requestTime      = "$context.requestTime"
+      httpMethod       = "$context.httpMethod"
+      routeKey         = "$context.routeKey"
+      status           = "$context.status"
+      protocol         = "$context.protocol"
+      responseLength   = "$context.responseLength"
       integrationError = "$context.integrationErrorMessage"
     })
   }
@@ -44,9 +48,11 @@ resource "aws_apigatewayv2_stage" "stage" {
   default_route_settings {
     detailed_metrics_enabled = true
   }
+
+  tags = var.tags
 }
 
-# 🔥 CRITICAL: Allow API Gateway to invoke Lambda
+# 🔥 Allow API Gateway to invoke Lambda
 resource "aws_lambda_permission" "allow_apigw" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"

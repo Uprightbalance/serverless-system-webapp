@@ -1,5 +1,7 @@
 resource "aws_sns_topic" "alerts" {
   name = "${var.project_name}-${var.environment}-alerts"
+
+  tags = var.tags
 }
 
 resource "aws_sns_topic_subscription" "email" {
@@ -23,6 +25,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   dimensions = {
     FunctionName = var.lambda_function_name
   }
+
+  tags = var.tags
 }
 
 # Lambda Duration
@@ -40,6 +44,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_duration" {
   dimensions = {
     FunctionName = var.lambda_function_name
   }
+
+  tags = var.tags
 }
 
 # Lambda Throttles
@@ -57,6 +63,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
   dimensions = {
     FunctionName = var.lambda_function_name
   }
+
+  tags = var.tags
 }
 
 # API Gateway 5xx
@@ -74,6 +82,8 @@ resource "aws_cloudwatch_metric_alarm" "api_5xx" {
   dimensions = {
     ApiId = var.api_id
   }
+
+  tags = var.tags
 }
 
 # DynamoDB Throttles
@@ -91,4 +101,6 @@ resource "aws_cloudwatch_metric_alarm" "ddb_throttles" {
   dimensions = {
     TableName = var.dynamodb_table_name
   }
+
+  tags = var.tags
 }

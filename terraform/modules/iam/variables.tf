@@ -14,3 +14,8 @@ variable "lambda_insights_layer_arn" {
   type    = string
   default = ""
 }
+
+variable "tags" {
+  type = map(string)
+  default = {}
+}

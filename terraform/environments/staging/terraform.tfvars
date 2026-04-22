@@ -1,4 +1,4 @@
-app_name      = "MR BAFFO API"
-cors_origins  = "https://dcbdcoc5wr22d.cloudfront.net"
+app_name     = "MR BAFFO API"
+cors_origins = "https://dcbdcoc5wr22d.cloudfront.net"
 
 alarm_email = "uprightwitdbalance@gmail.com"

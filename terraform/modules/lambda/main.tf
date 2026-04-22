@@ -1,6 +1,8 @@
 resource "aws_cloudwatch_log_group" "lambda" {
   name              = "/aws/lambda/${var.function_name}"
   retention_in_days = var.log_retention_days
+
+  tags = var.tags
 }
 
 resource "aws_lambda_function" "app" {
@@ -23,7 +25,10 @@ resource "aws_lambda_function" "app" {
       CORS_ORIGINS        = var.cors_origins
     }
   }
+
   depends_on = [
-      aws_cloudwatch_log_group.lambda
+    aws_cloudwatch_log_group.lambda
   ]
+
+  tags = var.tags
 }

@@ -21,3 +21,8 @@ variable "dynamodb_table_name" {
 variable "alarm_email" {
   type = string
 }
+
+variable "tags" {
+  type = map(string)
+  default = {}
+}

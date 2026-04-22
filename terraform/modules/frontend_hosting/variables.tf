@@ -13,3 +13,8 @@ variable "environment" {
 variable "unique_suffix" {
   type = string
 }
+
+variable "tags" {
+  type = map(string)
+  default = {}
+}

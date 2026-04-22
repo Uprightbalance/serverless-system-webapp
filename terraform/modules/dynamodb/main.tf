@@ -8,4 +8,6 @@ resource "aws_dynamodb_table" "app" {
     name = "id"
     type = "S"
   }
+
+  tags = var.tags
 }

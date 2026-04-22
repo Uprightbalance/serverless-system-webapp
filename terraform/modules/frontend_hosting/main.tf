@@ -1,11 +1,15 @@
 # 🌍 Frontend bucket
 resource "aws_s3_bucket" "frontend" {
   bucket = var.bucket_name
+
+  tags = var.tags
 }
 
 # 📦 CloudFront Logs Bucket
 resource "aws_s3_bucket" "cloudfront_logs" {
   bucket = "${var.project_name}-${var.environment}-${var.unique_suffix}-cf-logs"
+
+  tags = var.tags
 }
 
 # ✅ Enable ACL support (CRITICAL)
@@ -51,7 +55,7 @@ resource "aws_cloudfront_origin_access_control" "oac" {
 
 # 🚀 CloudFront Distribution
 resource "aws_cloudfront_distribution" "cdn" {
-  depends_on = [aws_s3_bucket_acl.logs_acl]  # 🔥 CRITICAL FIX
+  depends_on = [aws_s3_bucket_acl.logs_acl]
 
   enabled             = true
   default_root_object = "index.html"
@@ -103,12 +107,14 @@ resource "aws_cloudfront_distribution" "cdn" {
     error_caching_min_ttl = 0
   }
 
-  # 📊 Logging (FIXED)
+  # 📊 Logging
   logging_config {
     bucket          = "${aws_s3_bucket.cloudfront_logs.bucket}.s3.amazonaws.com"
     include_cookies = false
     prefix          = "cloudfront/"
   }
+
+  tags = var.tags
 }
 
 # 🔐 Allow CloudFront to access frontend bucket

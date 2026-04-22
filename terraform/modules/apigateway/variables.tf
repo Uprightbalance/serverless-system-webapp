@@ -11,6 +11,11 @@ variable "log_retention_days" {
   default = 14
 }
 
+variable "tags" {
+  type = map(string)
+  default = {}
+}
+
 variable "api_name" {
   type = string
 }

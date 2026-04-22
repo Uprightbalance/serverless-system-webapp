@@ -22,17 +22,26 @@ locals {
     data.aws_region.current.id,
     ""
   )
+
+  common_tags = {
+    Project     = var.project_name
+    Environment = var.environment
+  }
 }
 
 module "iam" {
   source       = "../../modules/iam"
   project_name = var.project_name
   environment  = var.environment 
+
+  tags = local.common_tags
 }
 
 module "dynamodb" {
   source     = "../../modules/dynamodb"
   table_name = "${var.project_name}-table-${var.environment}"
+
+  tags = local.common_tags
 }
 
 module "lambda" {
@@ -44,6 +53,8 @@ module "lambda" {
   environment   = var.environment
   app_name      = var.app_name
   cors_origins  = var.cors_origins
+
+  tags = local.common_tags
 }
 
 module "apigateway" {
@@ -55,6 +66,8 @@ module "apigateway" {
   project_name      = var.project_name
   environment       = var.environment
 
+  tags = local.common_tags
+
 }
 
 module "frontend_hosting" {
@@ -63,6 +76,8 @@ module "frontend_hosting" {
   project_name = var.project_name
   environment  = var.environment
   unique_suffix = var.unique_suffix
+
+  tags = local.common_tags
 }
 
 module "monitoring" {
@@ -75,4 +90,29 @@ module "monitoring" {
   dynamodb_table_name  = module.dynamodb.table_name
 
   alarm_email          = var.alarm_email
+
+  tags = local.common_tags
+}
+
+module "dashboard" {
+  source = "../../modules/dashboard"
+
+  project_name         = var.project_name
+  environment          = var.environment
+  lambda_function_name = module.lambda.function_name
+  api_id               = module.apigateway.api_id
+  dynamodb_table_name  = module.dynamodb.table_name
+
+  tags = local.common_tags
+}
+
+module "cost" {
+  source = "../../modules/cost"
+
+  project_name   = var.project_name
+  environment    = var.environment
+  monthly_budget = 15
+  alert_email    = var.alarm_email
+
+  tags = local.common_tags
 }
