@@ -344,6 +344,32 @@ DynamoDB was chosen because this application primarily needs to store simple req
 
 ---
 
+## Real-World Problem This Project Solves
+
+Many small-to-medium applications are over-engineered with always-on infrastructure that increases operational complexity, infrastructure management burden, and unnecessary cloud costs.
+
+Teams often struggle with:
+
+- maintaining backend servers for low or inconsistent traffic
+- manually deploying frontend and backend changes
+- poor visibility into cloud spend
+- inconsistent infrastructure across environments
+- weak monitoring and alerting
+- scaling infrastructure efficiently without overprovisioning
+- balancing operational simplicity with production readiness
+
+This project was designed to address those challenges by implementing a production-style serverless architecture on AWS using:
+
+- Terraform for repeatable Infrastructure as Code
+- AWS Lambda for event-driven backend execution
+- API Gateway for managed API exposure
+- DynamoDB for scalable serverless persistence
+- S3 + CloudFront for globally distributed frontend delivery
+- GitHub Actions for automated CI/CD workflows
+- CloudWatch, SNS, and AWS Budgets for operational visibility and cost awareness
+
+> The goal was not simply to deploy a serverless application, but to simulate how modern engineering teams build cost-efficient, low-maintenance cloud platforms that remain scalable, secure, and operationally manageable as applications evolve.
+
 # Decision Summary
 
 For this application’s workload and project goals, DynamoDB was the more appropriate engineering choice because it better aligned with:
