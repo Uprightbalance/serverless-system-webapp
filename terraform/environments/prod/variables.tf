@@ -11,7 +11,7 @@ variable "environment" {
 }
 
 variable "unique_suffix" {
-  default = "3455"
+  default = "34585423455"
 }
 
 variable "app_name" {
