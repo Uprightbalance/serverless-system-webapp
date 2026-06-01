@@ -54,7 +54,15 @@ jobs:
       # 📐 Terraform Plan
       - name: Terraform Plan
         working-directory: terraform/environments/prod
-        run: terraform plan -out=tfplan
+        run: |
+          terraform plan -detailed-exitcode || exit_code=$?
+          if [ ${exit_code:-0} -eq 0 ] || [ ${exit_code:-0} -eq 2 ]; then
+            echo "Terraform plan completed successfully."
+            exit 0
+          else
+            echo "Terraform plan failed with an actual error."
+            exit 1
+          fi
 
       # 🚀 Terraform Apply
       - name: Terraform Apply
