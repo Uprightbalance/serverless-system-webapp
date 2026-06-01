@@ -51,11 +51,11 @@ jobs:
         working-directory: terraform/environments/prod
         run: terraform validate
 
-      # 📐 Terraform Plan
+      # 📐 Terraform Plan (Writes the plan file out)
       - name: Terraform Plan
         working-directory: terraform/environments/prod
         run: |
-          terraform plan -detailed-exitcode || exit_code=$?
+          terraform plan -detailed-exitcode -out=tfplan || exit_code=$?
           if [ ${exit_code:-0} -eq 0 ] || [ ${exit_code:-0} -eq 2 ]; then
             echo "Terraform plan completed successfully."
             exit 0
@@ -64,7 +64,7 @@ jobs:
             exit 1
           fi
 
-      # 🚀 Terraform Apply
+      # 🚀 Terraform Apply (Reads the generated plan file)
       - name: Terraform Apply
         working-directory: terraform/environments/prod
         run: terraform apply -auto-approve tfplan
