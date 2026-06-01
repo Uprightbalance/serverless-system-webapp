@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket       = "serverless-app-tfstate-010741811189"
+    bucket       = "serverless-app-tfstate-016279725357"
     key          = "serverless/prod/terraform.tfstate"
     region       = "us-east-1"
     use_lockfile = true
@@ -19,7 +19,7 @@ locals {
 
   lambda_insights_layer_arn = lookup(
     local.lambda_insights_layer_arns,
-    data.aws_region.current.id,
+    data.aws_region.current.region,
     ""
   )
 
@@ -104,7 +104,7 @@ module "dashboard" {
   lambda_function_name = module.lambda.function_name
   api_id               = module.apigateway.api_id
   dynamodb_table_name  = module.dynamodb.table_name
-  aws_region           = data.aws_region.current.id
+  aws_region           = data.aws_region.current.region
 
   tags = local.common_tags
 }
