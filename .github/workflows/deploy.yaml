@@ -64,7 +64,7 @@ jobs:
             exit 1
           fi
 
-      # 🚀 terraform Apply
+      # 🚀 Terraform Apply
       - name: Terraform Apply
         working-directory: terraform/environments/prod
         run: terraform apply -auto-approve tfplan
